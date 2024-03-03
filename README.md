@@ -25,7 +25,7 @@ Simple Python 3 containerized web application.
 
 ## Deploy app in Kubernetes pod with autoscaling
 
-Note: Tp insure Kubernetes services are running:
+Note: To insure Kubernetes services are running:
 
 ``` bash
 kubectl cluster-info
@@ -40,7 +40,7 @@ kubectl get services
 # kubernetes   ClusterIP   X.X.X.X    <none>        443/TCP   6m11s
 ```
 
-1. Install Docker Registry (if not created): 
+1. Create local Docker Registry (if not created): 
    To run a Docker Registry container locally by executing the following command:
 
 ``` bash
