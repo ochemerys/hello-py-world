@@ -40,13 +40,7 @@ kubectl get services
 # kubernetes   ClusterIP   X.X.X.X    <none>        443/TCP   6m11s
 ```
 
-1. Create local Docker Registry (if not created): 
-   To run a Docker Registry container locally by executing the following command:
-
-``` bash
-docker run -d -p 8888:5000 --name registry registry:2
-
-```
+1. Create account in Docker Registry (if not created)
 
 1. To create docker image, run in project root folder:
 
@@ -57,20 +51,53 @@ docker run -d -p 8888:5000 --name registry registry:2
 1. Tag local image with the registry address (localhost:8888):
 
 ``` bash
-docker tag hello-world-app:latest localhost:8888/hello-world-app:latest
+docker tag hello-world-app:latest {accountname}/hello-world-app:latest
 ```
+
+Replace {accountname} with the name of the Deployment you want to delete.
 
 1. Push the tagged image to the local Docker Registry:
 
 ``` bash
-docker push localhost:8888/hello-world-app:latest
+docker push {accountname}/hello-world-app:latest
 ```
+
+Replace {accountname} with the name of the Deployment you want to delete.
 
 1. Apply the Kubernetes deployment and autoscaler configurations:
 
 ``` bash
 kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
 kubectl apply -f autoscaler.yaml
+```
+
+1. Verify deployments
+
+``` bash
+kubectl get deployments
+# output
+# NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+# hello-world   1/1     1            1           10m
+```
+
+1. Verify services
+
+``` bash
+kubectl get services
+# output
+# NAME                  TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+# hello-world-service   NodePort    10.110.130.229   <none>        8080:31036/TCP   11m
+# kubernetes            ClusterIP   10.96.0.1        <none>        443/TCP          28m
+```
+
+1. Verify autoscaling
+
+``` bash
+kubectl get hpa
+# output
+# NAME                     REFERENCE                TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+# hello-world-autoscaler   Deployment/hello-world   <unknown>/50%   2         5         0          25s
 ```
 
 ## Stop kubernetes service with autoscaling
@@ -110,4 +137,3 @@ kubectl delete deployment {deployment-name}
 ```
 
 Replace {deployment-name} with the name of the Deployment you want to delete.
-
