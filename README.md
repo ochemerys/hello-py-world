@@ -42,13 +42,13 @@ kubectl get services
 
 1. Create account in Docker Registry (if not created)
 
-1. To create docker image, run in project root folder:
+2. To create docker image, run in project root folder:
 
 ``` bash
   docker build -t hello-world-app .
 ```
 
-1. Tag local image with the registry address (localhost:8888):
+3. Tag local image with the registry address:
 
 ``` bash
 docker tag hello-world-app:latest {accountname}/hello-world-app:latest
@@ -56,7 +56,7 @@ docker tag hello-world-app:latest {accountname}/hello-world-app:latest
 
 Replace {accountname} with the name of the Deployment you want to delete.
 
-1. Push the tagged image to the local Docker Registry:
+4. Push the tagged image to the local Docker Registry:
 
 ``` bash
 docker push {accountname}/hello-world-app:latest
@@ -64,7 +64,7 @@ docker push {accountname}/hello-world-app:latest
 
 Replace {accountname} with the name of the Deployment you want to delete.
 
-1. Apply the Kubernetes deployment and autoscaler configurations:
+5. Apply the Kubernetes deployment and autoscaler configurations:
 
 ``` bash
 kubectl apply -f deployment.yaml
@@ -72,7 +72,7 @@ kubectl apply -f service.yaml
 kubectl apply -f autoscaler.yaml
 ```
 
-1. Verify deployments
+6. Verify deployments
 
 ``` bash
 kubectl get deployments
@@ -81,7 +81,7 @@ kubectl get deployments
 # hello-world   1/1     1            1           10m
 ```
 
-1. Verify services
+7. Verify services
 
 ``` bash
 kubectl get services
@@ -91,7 +91,7 @@ kubectl get services
 # kubernetes            ClusterIP   10.96.0.1        <none>        443/TCP          28m
 ```
 
-1. Verify autoscaling
+8. Verify autoscaling
 
 ``` bash
 kubectl get hpa
@@ -112,7 +112,7 @@ To stop Kubernetes autoscaling for a particular service, you need to delete the 
 kubectl get hpa
 ```
 
-1. Delete HPA: Once you've identified the HPA you want to delete, use the following command to delete it:
+2. Delete HPA: Once you've identified the HPA you want to delete, use the following command to delete it:
 
 ``` bash
 kubectl delete hpa {hpa-name}
@@ -130,7 +130,7 @@ To stop containers in Kubernetes, you typically delete the Deployment, that mana
 kubectl get deployments
 ```
 
-1. Delete Deployment: Once you've identified the Deployment you want to delete, use the following command to delete it:
+2. Delete Deployment: Once you've identified the Deployment you want to delete, use the following command to delete it:
 
 ``` bash
 kubectl delete deployment {deployment-name}
