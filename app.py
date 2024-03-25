@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file
 from werkzeug.utils import secure_filename
 import os
+from io import BytesIO
 import mysql.connector
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from urllib.parse import quote
 
 app = Flask(__name__)
 
@@ -71,7 +73,7 @@ def upload_file():
             filename = secure_filename(file.filename)
             # upload file to Azure
             filepath = container_name
-            blob_client = container_client.get_blob_client(file.filename)
+            blob_client = container_client.get_blob_client(filename)
             blob_client.upload_blob(file.stream)
             # Save file info to MySQL database
             try:
@@ -88,9 +90,38 @@ def upload_file():
     return render_template('upload.html')
 
 # Download file
-@app.route('/download/<filename>')
-def download_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route("/download/<id>", methods=["GET"])
+def download_file(id):
+  if request.method == "GET":
+    print('download ' + str(id))
+    # Get filename from DB
+    conn = get_mysql_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT filename FROM files WHERE id=" + str(id))
+    filename = cursor.fetchone()
+
+    if len(filename) == 0 :
+        return jsonify({"error": f"Wrong file id: {id}"})
+    
+    # Download the blob
+    try:
+      print(filename[0])
+      file_name = filename[0] #'Statement_Aug 2023.pdf'
+      print(file_name)
+      encoded_file_name = quote(file_name)
+      print(encoded_file_name)
+      blob_client = container_client.get_blob_client(encoded_file_name)
+      blob_data = blob_client.download_blob()
+
+      # Set Content-Disposition header to make the browser download the file
+      response = send_file(BytesIO(blob_data.readall()),
+                         attachment_filename=file_name,
+                         as_attachment=True)
+      return response
+    except Exception as e:
+      return jsonify({"error": f"Error downloading blob: {str(e)}"})
+  
+  return jsonify({"error": "Invalid request method"})
 
 if __name__ == '__main__':
     app.run(debug=True)

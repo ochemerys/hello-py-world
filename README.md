@@ -25,34 +25,15 @@ Simple Python 3 containerized web application.
 
 Navigate it browser to <http://localhost:8080>
 
-## Run MySQL in container
+## Run MySQL as Azure MySQL Flexible Service
 
-1. Pull the MySQL Docker Image:
-
-``` bash
-docker pull mysql:latest
-```
-
-2. Run the MySQL Container:
-
-``` bash
-docker run -d -e MYSQL_ROOT_PASSWORD=my-secret-password mysql:latest
-# if existing MqSQL is already running on port 3306, switch to another port 3307
-docker run -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=my-secret-password mysql:latest
-
-docker ps -a
-```
 
 ## Prepare MySQL database for application
 
 1. Connect to MySQL:
 
 ``` bash
-docker exec -it <container_id> mysql -u root -p
-```
-
-``` bash
-mysql -u app_admin -p -h <hostname> -P 3306
+mysql -u <username> -p -h <hostname> -P 3306
 ```
 
 2. Execute in MySQL terminal to create database and table:

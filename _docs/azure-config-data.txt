@@ -11,9 +11,7 @@ Storage Account
 ================
 1.  Navigate to your storage account:  Log in to the Azure portal and go to your desired storage account.
 
-2.  Access Settings:  On the left blade of the storage account window, locate the "Settings" section and click on it.
-
-3.  Find "Access keys": Within the Settings section, look for "Security + networking" and then click on "Access keys".
+2.  Find "Access keys": Within the Settings section, look for "Security + networking" and then click on "Access keys".
 
 4.  View Connection Strings:  Under "Access keys," you'll see two keys named "Primary access key" and "Secondary access key". 
     Each key has a corresponding "Connection string".
