@@ -42,21 +42,45 @@ container_client = blob_service_client.get_container_client(container_name)
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
+
 # Function to check if file extension is allowed
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+def get_file_name(id):
+    # Get filename from DB
+    try:
+        conn = get_mysql_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT filename FROM files WHERE id=" + str(id))
+        filename = cursor.fetchone()
+
+        if len(filename) == 0 :
+            raise ValueError('Wrong file id: {id}.')
+
+        return filename[0]
+    except Exception as e:
+        raise Exception('Error querying database: {str(e)}')
+    finally:
+        cursor.close()
+        conn.close()
+   
+
 # Home page
 @app.route('/')
 def home():
-    conn = get_mysql_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM files")
-    files = cursor.fetchall()
-    for f in files:
-        print(f)
-    return render_template('index.html', files=files)
+    try:
+        conn = get_mysql_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM files")
+        files = cursor.fetchall()
+        return render_template('index.html', files=files)
+    finally:
+        cursor.close()
+        conn.close()
+
 
 # Upload file page
 @app.route('/upload', methods=['GET', 'POST'])
@@ -89,27 +113,14 @@ def upload_file():
             return redirect(url_for('home'))
     return render_template('upload.html')
 
+
 # Download file
 @app.route("/download/<id>", methods=["GET"])
 def download_file(id):
   if request.method == "GET":
-    print('download ' + str(id))
-    # Get filename from DB
-    conn = get_mysql_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT filename FROM files WHERE id=" + str(id))
-    filename = cursor.fetchone()
-
-    if len(filename) == 0 :
-        return jsonify({"error": f"Wrong file id: {id}"})
-    
-    # Download the blob
     try:
-      print(filename[0])
-      file_name = filename[0] #'Statement_Aug 2023.pdf'
-      print(file_name)
+      file_name = get_file_name(id)
       encoded_file_name = quote(file_name)
-      print(encoded_file_name)
       blob_client = container_client.get_blob_client(encoded_file_name)
       blob_data = blob_client.download_blob()
 
@@ -122,6 +133,33 @@ def download_file(id):
       return jsonify({"error": f"Error downloading blob: {str(e)}"})
   
   return jsonify({"error": "Invalid request method"})
+
+
+@app.route('/delete/<id>', methods=['DELETE'])
+def delete_file(id):
+    print(id)
+    try:
+        file_name = get_file_name(id)
+        encoded_file_name = quote(file_name)
+        # Delete file from storage
+        blob_client = container_client.get_blob_client(encoded_file_name)
+        blob_client.delete_blob()
+        # Delete file from to MySQL database
+        try:
+            conn = get_mysql_connection()
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM files WHERE id=' + id)
+            conn.commit()
+        except mysql.connector.Error as err:
+            print("MySQL Error:", err)
+        finally:
+            cursor.close()
+            conn.close()
+        return f"File '{file_name}' deleted successfully", 200
+    except Exception as e:
+        print(e)
+        return str(e), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
