@@ -162,5 +162,8 @@ cython_debug/
 # VS Code
 .vscode/
 
-*.config
+# backup folder
+_backup/
 
+# config files
+*.config
