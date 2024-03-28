@@ -56,7 +56,7 @@ quit
   docker run -p 8080:5000 hello-world-app
 ```
 
-1. Open App in browser by navigating to <http://localhost:8080>
+3. Open App in browser by navigating to <http://localhost:8080>
 
 ## Local Kubernetes pod with autoscaling
 
@@ -86,18 +86,18 @@ kubectl get services
 3. Tag local image with the registry address:
 
 ``` bash
-docker tag hello-world-app:latest {accountname}/hello-world-app:latest
+docker tag hello-world-app:latest <accountname>/hello-world-app:latest
 ```
 
-Replace {accountname} with the name of the Deployment you want to delete.
+Replace <accountname> with the name of the Deployment you want to delete.
 
 4. Push the tagged image to the local Docker Registry:
 
 ``` bash
-docker push {accountname}/hello-world-app:latest
+docker push <accountname>/hello-world-app:latest
 ```
 
-Replace {accountname} with the name of the Deployment you want to delete.
+Replace <accountname> with the name of the Deployment you want to delete.
 
 5. Apply the Kubernetes deployment and autoscaler configurations:
 
@@ -150,7 +150,7 @@ kubectl get hpa
 2. Delete HPA: Once you've identified the HPA you want to delete, use the following command to delete it:
 
 ``` bash
-kubectl delete hpa {hpa-name}
+kubectl delete hpa <hpa-name>
 ```
 
 Replace {hpa-name} with the name of the HPA you want to delete. This will stop autoscaling for the specified service.
@@ -168,11 +168,7 @@ kubectl get deployments
 2. Delete Deployment: Once you've identified the Deployment you want to delete, use the following command to delete it:
 
 ``` bash
-kubectl delete deployment {deployment-name}
+kubectl delete deployment <deployment-name>
 ```
 
 Replace {deployment-name} with the name of the Deployment you want to delete.
-3. Open App in browser
-
-Navigate it browser to <http://localhost:8080>
-
